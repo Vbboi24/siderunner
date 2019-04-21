@@ -1,22 +1,23 @@
 
 SIDErunner
 ====
-A framework for running Selenium IDE tests from within Python without having to export those 
-tests.   It reads the tests in their native XML format and makes corresponding webdriver calls 
+A framework for running Selenium IDE tests from within Python without having to export those
+tests.   It reads the tests in their native XML format and makes corresponding webdriver calls
 based on the contents of the XML files.
 
 It can run both tests and test suites.
 
 Installation
 ----
+
+    pip install siderunner
+
 To use in headless mode you'll need selenium, pyvirtualdisplay and a browser such as FireFox.
 
     $ apt-get install xvfb xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic
     $ apt-get install pyvirtualdisplay
     $ apt-get install selenium
     $ apt-get install firefox
-
-Then make sure the siderunner library is on your python path.
 
 
 Example
@@ -26,28 +27,21 @@ This example runs a simple test suite created with Selenium IDE and saved as .xm
 
     #!/usr/bin/python
 
-    from selenium import webdriver
-    from siderunner import SeleniumTestSuite
-    from pyvirtualdisplay import Display
+    import os
+    import siderunner
 
-    display = Display(visible=1, size=(1920,1024))
-    display.start()
+    here = os.path.join(os.path.dirname(__file__), 'tests')
 
-    url = 'http://localhost'
-    suite = 'basic_tests'
+    class SystemTests(siderunner.SeleniumTests):
 
-    pathname = 'myproject/mytests/%s' % suite
-    driver = webdriver.FireFox()
-    driver.implicitly_wait(10)
-    try:
+        headless = True
+        url = 'http://localhost'
+        path = os.path.join(here, 'scripts')
+        size = (1024, 2048)
 
-        tests = SeleniumTestSuite(pathname)
-        try:
-            tests.run(driver, url)
-        except:
-            driver.save_screenshot('%s-suite_error_screen.png' % suite)
-    finally:
-        driver.quit()
-        display.stop()
+        def test_suite_one(self):
+            self.run_suite('suite-one')
 
+        def test_suite_two(self):
+            self.run_suite('suite-two')
 
